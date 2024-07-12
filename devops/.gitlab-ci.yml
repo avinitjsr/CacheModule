@@ -1,0 +1,31 @@
+stages:
+  - build
+  - test
+
+variables:
+  GO111MODULE: "on"
+
+before_script:
+  - go mod download
+
+build:
+  stage: build
+  script:
+    - go build -o cache ./...
+  artifacts:
+    paths:
+      - cache
+
+test:
+  stage: test
+  script:
+    - go test -v ./...
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying to registry"
+    - docker build -t registry.mycompany.com/cache:latest .
+    - docker push registry.mycompany.com/cache:latest
+  only:
+    - main
